@@ -617,6 +617,24 @@ impl<'a, T: ContextProvider> ContextProvider for &'a mut T {
     }
 }
 
+impl<T: ContextProvider> ContextProvider for std::sync::Arc<T> {
+    fn get_var(&self, name: &str) -> Option<f64> {
+        (**self).get_var(name)
+    }
+    fn eval_func(&self, name: &str, args: &[f64]) -> Result<f64, FuncEvalError> {
+        (**self).eval_func(name, args)
+    }
+}
+
+impl<T: ContextProvider> ContextProvider for std::rc::Rc<T> {
+    fn get_var(&self, name: &str) -> Option<f64> {
+        (**self).get_var(name)
+    }
+    fn eval_func(&self, name: &str, args: &[f64]) -> Result<f64, FuncEvalError> {
+        (**self).eval_func(name, args)
+    }
+}
+
 impl<T: ContextProvider, S: ContextProvider> ContextProvider for (T, S) {
     fn get_var(&self, name: &str) -> Option<f64> {
         self.0.get_var(name).or_else(|| self.1.get_var(name))
